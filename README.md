@@ -101,7 +101,7 @@ channel.start_consuming()
 Выполняем скрипт **consumer.py**
 <img src = "img/04.png" width = 100%>
 
-Модифицированные скрипты с названием очереди и отправляемым сообщением:
+**Модифицированные скрипты с названием очереди и отправляемым сообщением:**
 
 Скрипт **producer.py**
 ```
@@ -109,7 +109,7 @@ channel.start_consuming()
 # coding=utf-8
 import pika
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.101'))
 channel = connection.channel()
 
 channel.queue_declare(queue='hello_world')
@@ -124,7 +124,7 @@ connection.close()
 # coding=utf-8
 import pika
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.101'))
 channel = connection.channel()
 
 channel.queue_declare(queue='hello_world')
@@ -165,8 +165,44 @@ $ rabbitmqadmin get queue='hello'
 
 Приложите скриншот результата работы второго скрипта.
 
-Скриншот из web-интерфейса **RabbitMQ**:
+### Ответ:
+ 
+**Добавляем на каждую ВМ в файл hosts название и IP-адрес каждой машины**
+```
+echo "192.168.0.101 rmq01" | sudo tee -a /etc/hosts
+echo "192.168.0.102 rmq02" | sudo tee -a /etc/hosts
+```
+**Устанавливаем второй экземпляр RabbitMQ на вторую ВМ **rmq02**, согласно задания 1.**
+
+**Объединяем машины в кластер:**
+
+На машине **rmq01** выполняем команды, чтобы разрешить кластеризацию:
+```
+rabbitmqctl stop_app
+rabbitmqctl reset
+rabbitmqctl start_app
+```
 <img src = "img/05.png" width = 100%>
+
+На машине **rmq02** выполняем команды, чтобы добавить в кластер и синхронизировать:
+
+```
+rabbitmqctl stop_app
+rabbitmqctl reset
+rabbitmqctl join_cluster rabbit@rmq01
+rabbitmqctl start_app
+```
+<img src = "img/06.png" width = 100%>
+
+На обеих машинах **rmq01** и **rmq02** проверяем статус командой:
+```
+rabbitmqctl cluster_status
+```
+**rmq01**
+<img src = "img/07.png" width = 100%>
+
+**rmq02**
+<img src = "img/08.png" width = 100%>
 
 
 ---
