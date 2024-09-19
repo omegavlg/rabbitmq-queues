@@ -57,13 +57,14 @@ yum install -y python3
 pip3 install pika
 ```
 **Редактируем скрипты:**
+
 Скрипт **producer.py**
 ```
 #!/usr/bin/env python
 # coding=utf-8
 import pika
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.101'))
 channel = connection.channel()
 
 channel.queue_declare(queue='hello')
@@ -78,7 +79,7 @@ connection.close()
 # coding=utf-8
 import pika
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.101'))
 channel = connection.channel()
 
 channel.queue_declare(queue='hello')
