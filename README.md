@@ -98,6 +98,45 @@ channel.start_consuming()
 Скриншот из web-интерфейса **RabbitMQ**:
 <img src = "img/03.png" width = 100%>
 
+Выполняем скрипт **consumer.py**
+<img src = "img/04.png" width = 100%>
+
+Модифицированные скрипты с названием очереди и отправляемым сообщением:
+
+Скрипт **producer.py**
+```
+#!/usr/bin/env python
+# coding=utf-8
+import pika
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='hello_world')
+
+channel.basic_publish(exchange='', routing_key='hello_world', body='We come in peace!')
+print(" [x] Sent 'We come in peace!'")
+connection.close()
+```
+Скрипт **consumer.py**
+```
+#!/usr/bin/env python
+# coding=utf-8
+import pika
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='hello_world')
+
+def callback(ch, method, properties, body):
+    print(" [x] Received %r" % body)
+
+channel.basic_consume(queue='hello_world', on_message_callback=callback, auto_ack=True)
+
+print(' [*] Waiting for messages. To exit press CTRL+C')
+channel.start_consuming()
+```
 ---
 ## Задание 3. Подготовка HA кластера
 Используя Vagrant или VirtualBox, создайте вторую виртуальную машину и установите RabbitMQ. Добавьте в файл hosts название и IP-адрес каждой машины, чтобы машины могли видеть друг друга по имени.
@@ -125,6 +164,10 @@ $ rabbitmqadmin get queue='hello'
 После чего попробуйте отключить одну из нод, желательно ту, к которой подключались из скрипта, затем поправьте параметры подключения в скрипте consumer.py на вторую ноду и запустите его.
 
 Приложите скриншот результата работы второго скрипта.
+
+Скриншот из web-интерфейса **RabbitMQ**:
+<img src = "img/05.png" width = 100%>
+
 
 ---
 ## Задание 4*. Ansible playbook
