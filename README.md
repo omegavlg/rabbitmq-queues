@@ -10,23 +10,23 @@
 
 ### Ответ:
 
-**Установка:**
+**Устанавливаем RabbitMQ:**
 ```
 yum update -y
 yum install -y epel-release
 yum install -y erlang
 yum install -y rabbitmq-server
 ```
-**Запуск:**
+**Запускаем:**
 ```
 systemctl enable rabbitmq-server
 systemctl start rabbitmq-server
 ```
-**Активиция плагина управления RabbitMQ:**
+**Активируем плагин управления RabbitMQ:**
 ```
 rabbitmq-plugins enable rabbitmq_management
 ```
-**Перезапуск:**
+**Перезапускаем:**
 ```
 systemctl restart rabbitmq-server
 ```
@@ -45,6 +45,54 @@ $ pip install pika
 В качестве решения домашнего задания приложите оба скриншота, сделанных на этапе выполнения.
 
 Для закрепления материала можете попробовать модифицировать скрипты, чтобы поменять название очереди и отправляемое сообщение.
+
+### Ответ:
+
+**Устанавливаем Python3:**
+```
+yum install -y python3
+```
+**Устанавливаем библиотеку pika:**
+```
+pip3 install pika
+```
+**Редактируем скрипты:**
+Скрипт **producer.py**
+```
+#!/usr/bin/env python
+# coding=utf-8
+import pika
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='hello')
+
+channel.basic_publish(exchange='', routing_key='hello', body='Hello Netology!')
+print(" [x] Sent 'Hello Netology!'")
+connection.close()
+```
+Скрипт **consumer.py**
+```
+#!/usr/bin/env python
+# coding=utf-8
+import pika
+
+connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+channel = connection.channel()
+
+channel.queue_declare(queue='hello')
+
+def callback(ch, method, properties, body):
+    print(" [x] Received %r" % body)
+
+channel.basic_consume(queue='hello', on_message_callback=callback, auto_ack=True)
+
+print(' [*] Waiting for messages. To exit press CTRL+C')
+channel.start_consuming()
+```
+
+
 
 ---
 ## Задание 3. Подготовка HA кластера
