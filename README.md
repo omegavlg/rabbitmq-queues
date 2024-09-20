@@ -65,12 +65,24 @@ pip3 install pika
 # coding=utf-8
 import pika
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.111'))
+# Учетные данные для подключения
+credentials = pika.PlainCredentials('test', 'test')
+
+# Параметры подключения с использованием учетных данных
+parameters = pika.ConnectionParameters('192.168.58.111', credentials=credentials)
+
+# Подключение к RabbitMQ
+connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 
+# Объявление очереди
 channel.queue_declare(queue='hello')
 
-channel.basic_publish(exchange='', routing_key='hello', body='Hello Netology!')
+# Отправка сообщения
+channel.basic_publish(exchange='',
+                      routing_key='hello',
+                      body='Hello Netology!')
+
 print(" [x] Sent 'Hello Netology!'")
 connection.close()
 ```
@@ -79,19 +91,37 @@ connection.close()
 #!/usr/bin/env python
 # coding=utf-8
 import pika
+import sys
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.111'))
+# Учетные данные для подключения
+credentials = pika.PlainCredentials('test', 'test')
+
+# Параметры подключения с использованием учетных данных
+parameters = pika.ConnectionParameters('192.168.58.111', credentials=credentials)
+
+# Подключение к RabbitMQ
+connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 
+# Объявление очереди
 channel.queue_declare(queue='hello')
 
+# Обработка полученного сообщения
 def callback(ch, method, properties, body):
     print(" [x] Received %r" % body)
 
+# Подписка на очередь
 channel.basic_consume(queue='hello', on_message_callback=callback, auto_ack=True)
 
 print(' [*] Waiting for messages. To exit press CTRL+C')
-channel.start_consuming()
+
+try:
+    channel.start_consuming()
+except KeyboardInterrupt:
+    print('Exiting...')
+    channel.stop_consuming()
+
+connection.close()
 ```
 Выполняем скрипт **producer.py** 
 ```
@@ -107,6 +137,9 @@ python3 producer.py
 python3 consumer.py
 ```
 <img src = "img/04.png" width = 100%>
+
+Скриншот из web-интерфейса **RabbitMQ**
+<img src = "img/05.png" width = 100%>
 
 **Модифицированные скрипты с названием очереди и отправляемым сообщением**:
 
