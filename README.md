@@ -271,11 +271,18 @@ rabbitmqctl cluster_status
 **rmq02**
 <img src = "img/09.png" width = 100%>
 
-На машине **rmq01** выполняем команду для настройки политики HA:
+На машине **rmq01** выполняем команду для настройки политики **HA**:
 ```
 rabbitmqctl set_policy ha-all ".*" '{"ha-mode":"all"}'
 ```
 <img src = "img/10.png" width = 100%>
+
+Доступные ноды в кластере 
+<img src = "img/11.png" width = 100%>
+
+Включённая политика **HA**.
+<img src = "img/12.png" width = 100%>
+
 
 Выполняем на **rmq01** скрипт **producer.py**:
 
