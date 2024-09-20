@@ -277,14 +277,32 @@ rabbitmqctl set_policy ha-all ".*" '{"ha-mode":"all"}'
 ```
 <img src = "img/10.png" width = 100%>
 
-Доступные ноды в кластере 
+Доступные ноды в кластере:
 <img src = "img/11.png" width = 100%>
 
-Включённая политика **HA**.
+Включённая политика **HA**:
 <img src = "img/12.png" width = 100%>
 
 
-Выполняем на **rmq01** скрипт **producer.py**:
+Выполняем скрипт **producer.py** на каждой из нод:
+
+**rmq01**
+<img src = "img/13.png" width = 100%>
+
+**rmq02**
+<img src = "img/14.png" width = 100%>
+
+Выполняем команду на **rmq01**
+```
+rabbitmqadmin get queue='hello'
+```
+<img src = "img/15.png" width = 100%>
+<img src = "img/16.png" width = 100%>
+
+Далее выполняем скрипт **consumer.py** на ноде **rmq02**:
+
+<img src = "img/17.png" width = 100%>
+<img src = "img/18.png" width = 100%>
 
 
 ---
@@ -292,3 +310,7 @@ rabbitmqctl set_policy ha-all ".*" '{"ha-mode":"all"}'
 Напишите плейбук, который будет производить установку RabbitMQ на любое количество нод и объединять их в кластер. При этом будет автоматически создавать политику ha-all.
 
 Готовый плейбук разместите в своём репозитории.
+
+### Ответ:
+
+Сил уже не хватило на плейбук =)
