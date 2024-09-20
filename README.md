@@ -30,7 +30,7 @@ rabbitmq-plugins enable rabbitmq_management
 systemctl restart rabbitmq-server
 ```
 
-В браузере переходим в web-интерфес по адресу: http://192.168.58.101:15672
+В браузере переходим в web-интерфес по адресу: http://192.168.58.111:15672
 <img src = "img/01.png" width = 100%>
 
 ---
@@ -149,12 +149,21 @@ python3 consumer.py
 # coding=utf-8
 import pika
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.111'))
+# Учетные данные для подключения
+credentials = pika.PlainCredentials('test', 'test')
+
+# Параметры подключения с использованием учетных данных
+parameters = pika.ConnectionParameters('192.168.58.111', credentials=credentials)
+
+# Подключение к RabbitMQ
+connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 
-channel.queue_declare(queue='hello_world')
+# Объявление очереди
+channel.queue_declare(queue='Hello World')
 
-channel.basic_publish(exchange='', routing_key='hello_world', body='We come in peace!')
+# Отправка сообщения
+channel.basic_publish(exchange='', routing_key='Hello World', body='We come in peace!')
 print(" [x] Sent 'We come in peace!'")
 connection.close()
 ```
@@ -163,19 +172,37 @@ connection.close()
 #!/usr/bin/env python
 # coding=utf-8
 import pika
+import sys
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.111'))
+# Учетные данные для подключения
+credentials = pika.PlainCredentials('test', 'test')
+
+# Параметры подключения с использованием учетных данных
+parameters = pika.ConnectionParameters('192.168.58.111', credentials=credentials)
+
+# Подключение к RabbitMQ
+connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
 
-channel.queue_declare(queue='hello_world')
+# Объявление очереди
+channel.queue_declare(queue='Hello World')
 
+# Обработка полученного сообщения
 def callback(ch, method, properties, body):
     print(" [x] Received %r" % body)
 
-channel.basic_consume(queue='hello_world', on_message_callback=callback, auto_ack=True)
+# Подписка на очередь
+channel.basic_consume(queue='Hello World', on_message_callback=callback, auto_ack=True)
 
 print(' [*] Waiting for messages. To exit press CTRL+C')
-channel.start_consuming()
+
+try:
+    channel.start_consuming()
+except KeyboardInterrupt:
+    print('Exiting...')
+    channel.stop_consuming()
+
+connection.close()
 ```
 ---
 ## Задание 3. Подготовка HA кластера
@@ -222,7 +249,7 @@ rabbitmqctl stop_app
 rabbitmqctl reset
 rabbitmqctl start_app
 ```
-<img src = "img/05.png" width = 100%>
+<img src = "img/06.png" width = 100%>
 
 На машине **rmq02** выполняем команды, чтобы добавить в кластер и синхронизировать:
 
@@ -232,23 +259,23 @@ rabbitmqctl reset
 rabbitmqctl join_cluster rabbit@rmq01
 rabbitmqctl start_app
 ```
-<img src = "img/06.png" width = 100%>
+<img src = "img/07.png" width = 100%>
 
 На обеих машинах **rmq01** и **rmq02** проверяем статус командой:
 ```
 rabbitmqctl cluster_status
 ```
 **rmq01**
-<img src = "img/07.png" width = 100%>
+<img src = "img/08.png" width = 100%>
 
 **rmq02**
-<img src = "img/08.png" width = 100%>
+<img src = "img/09.png" width = 100%>
 
 На машине **rmq01** выполняем команду для настройки политики HA:
 ```
 rabbitmqctl set_policy ha-all ".*" '{"ha-mode":"all"}'
 ```
-<img src = "img/09.png" width = 100%>
+<img src = "img/10.png" width = 100%>
 
 Выполняем на **rmq01** скрипт **producer.py**:
 
