@@ -65,7 +65,7 @@ pip3 install pika
 # coding=utf-8
 import pika
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.101'))
+connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.111'))
 channel = connection.channel()
 
 channel.queue_declare(queue='hello')
@@ -80,7 +80,7 @@ connection.close()
 # coding=utf-8
 import pika
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.101'))
+connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.111'))
 channel = connection.channel()
 
 channel.queue_declare(queue='hello')
@@ -93,13 +93,19 @@ channel.basic_consume(queue='hello', on_message_callback=callback, auto_ack=True
 print(' [*] Waiting for messages. To exit press CTRL+C')
 channel.start_consuming()
 ```
-Выполняем скрипт **producer.py**
+Выполняем скрипт **producer.py** 
+```
+python3 producer.py
+```
 <img src = "img/02.png" width = 100%>
 
 Скриншот из web-интерфейса **RabbitMQ**:
 <img src = "img/03.png" width = 100%>
 
 Выполняем скрипт **consumer.py**
+```
+python3 consumer.py
+```
 <img src = "img/04.png" width = 100%>
 
 **Модифицированные скрипты с названием очереди и отправляемым сообщением**:
@@ -110,7 +116,7 @@ channel.start_consuming()
 # coding=utf-8
 import pika
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.101'))
+connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.111'))
 channel = connection.channel()
 
 channel.queue_declare(queue='hello_world')
@@ -125,7 +131,7 @@ connection.close()
 # coding=utf-8
 import pika
 
-connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.101'))
+connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.58.111'))
 channel = connection.channel()
 
 channel.queue_declare(queue='hello_world')
@@ -170,8 +176,8 @@ $ rabbitmqadmin get queue='hello'
  
 **Добавляем на каждую ВМ в файл hosts название и IP-адрес каждой машины**
 ```
-echo "192.168.58.101 rmq01" | sudo tee -a /etc/hosts
-echo "192.168.58.102 rmq02" | sudo tee -a /etc/hosts
+echo "192.168.58.111 rmq01" | sudo tee -a /etc/hosts
+echo "192.168.58.112 rmq02" | sudo tee -a /etc/hosts
 ```
 **Устанавливаем второй экземпляр RabbitMQ на вторую ВМ **rmq02**, согласно задания 1.**
 
