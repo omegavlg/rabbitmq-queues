@@ -1,7 +1,6 @@
 # Домашнее задание к занятию "`Очереди RabbitMQ`" - `Дедюрин Денис`
 
 ---
-
 ## Задание 1. Установка RabbitMQ
 
 Используя Vagrant или VirtualBox, создайте виртуальную машину и установите RabbitMQ. Добавьте management plug-in и зайдите в веб-интерфейс.
@@ -26,10 +25,12 @@ systemctl start rabbitmq-server
 ```
 rabbitmq-plugins enable rabbitmq_management
 ```
-**Перезапускаем:**
+**Перезапускаем RabbitMQ:**
 ```
 systemctl restart rabbitmq-server
 ```
+
+В браузере переходим в web-интерфес по адресу: http://192.168.58.101:15672
 <img src = "img/01.png" width = 100%>
 
 ---
@@ -58,7 +59,7 @@ pip3 install pika
 ```
 **Редактируем скрипты:**
 
-Скрипт **producer.py**
+Скрипт **producer.py**:
 ```
 #!/usr/bin/env python
 # coding=utf-8
@@ -73,7 +74,7 @@ channel.basic_publish(exchange='', routing_key='hello', body='Hello Netology!')
 print(" [x] Sent 'Hello Netology!'")
 connection.close()
 ```
-Скрипт **consumer.py**
+Скрипт **consumer.py**:
 ```
 #!/usr/bin/env python
 # coding=utf-8
@@ -101,9 +102,9 @@ channel.start_consuming()
 Выполняем скрипт **consumer.py**
 <img src = "img/04.png" width = 100%>
 
-**Модифицированные скрипты с названием очереди и отправляемым сообщением:**
+**Модифицированные скрипты с названием очереди и отправляемым сообщением**:
 
-Скрипт **producer.py**
+Скрипт **producer.py**:
 ```
 #!/usr/bin/env python
 # coding=utf-8
@@ -118,7 +119,7 @@ channel.basic_publish(exchange='', routing_key='hello_world', body='We come in p
 print(" [x] Sent 'We come in peace!'")
 connection.close()
 ```
-Скрипт **consumer.py**
+Скрипт **consumer.py**:
 ```
 #!/usr/bin/env python
 # coding=utf-8
@@ -169,8 +170,8 @@ $ rabbitmqadmin get queue='hello'
  
 **Добавляем на каждую ВМ в файл hosts название и IP-адрес каждой машины**
 ```
-echo "192.168.0.101 rmq01" | sudo tee -a /etc/hosts
-echo "192.168.0.102 rmq02" | sudo tee -a /etc/hosts
+echo "192.168.58.101 rmq01" | sudo tee -a /etc/hosts
+echo "192.168.58.102 rmq02" | sudo tee -a /etc/hosts
 ```
 **Устанавливаем второй экземпляр RabbitMQ на вторую ВМ **rmq02**, согласно задания 1.**
 
@@ -203,6 +204,14 @@ rabbitmqctl cluster_status
 
 **rmq02**
 <img src = "img/08.png" width = 100%>
+
+На машине **rmq01** выполняем команду для настройки политики HA:
+```
+rabbitmqctl set_policy ha-all ".*" '{"ha-mode":"all"}'
+```
+<img src = "img/09.png" width = 100%>
+
+Выполняем на **rmq01** скрипт **producer.py**:
 
 
 ---
